@@ -199,10 +199,7 @@ feat_select = rfe(trainset[,2:ncol(trainset)],
 save.image() # Started at 12:35am
 
 
-outcomeName<-'Loan_Status'
-predictors<-names(trainSet)[!names(trainSet) %in% outcomeName]
-Loan_Pred_Profile <- rfe(trainSet[,predictors], trainSet[,outcomeName],
-                         rfeControl = control)
+
 
 
 
