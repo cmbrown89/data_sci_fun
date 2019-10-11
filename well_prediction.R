@@ -16,7 +16,8 @@ library(caret) # machine learning
 #### gps height altitude of welll
 #### payment - what the water costs
 wp_feats = read.csv("waterpumpfeatures.csv")
-train_target = read.csv("traintargets.csv")
+train_target = read.csv("train_targets.csv")
+#write.table(train_target, "train_targets.csv", quote = F, sep = ",")
 
 # Time to start exploring the data
 # First plot well locations across Tanzania
@@ -92,7 +93,7 @@ low_categoricals = categoricals[,which(uniques < 10)]
 
 uniques[uniques < 10]
 
-# Need to decide what to do with empty spaces in public_meeting, permit
+# Need to decide what to do with empty spaces in public_meeting, permit: Changing to "Unknown"
 sapply(low_categoricals, table)
 
 
@@ -143,11 +144,65 @@ fil.all = all[,!names(all) %in% c("id",
                                   "construction_year"
                                   )]
 
+# Try new package
+library(DataExplorer)
+
+# Create report
+create_report(fil.all)
 
 # Supervised machine learning: Going first try using decision trees
 # Helpful links: https://machinelearningmastery.com/pre-process-your-dataset-in-r/
 # Helpful links: 
 
+library(caret)
+library(randomForest)
+# First convert outcome (dependent) variable to numeric
+fil.all$status_group = fil.all$status_group %>%
+  as.numeric()
+
+# Check; result: Numbers look good
+table(all$status_group)
+
+# Perform one-hot encoding to convert categorical variables to numeric ones for the algorithm
+dummys = dummyVars( ~ ., data = fil.all)
+
+dummys.fil.all = predict(dummys, newdata = fil.all, fullRank = T) %>%
+  as.data.frame()
+
+dummys.fil.all$status_group = dummys.fil.all$status_group %>%
+  as.factor()
+
+# What are our data's new dimensions
+dummys.fil.all %>%
+  as.data.frame() %>%
+  dim()
+
+# First split data into training (75%) and testing (25%) sets
+# argument p is the percentage of data that goes to training
+index = createDataPartition(dummys.fil.all$status_group, p = 0.75, list = F)
+trainset = dummys.fil.all[index,]
+testset = dummys.fil.all[-index,]
+
+# Get help from random forest for feature selection
+feat_select_control = rfeControl(functions = rfFuncs,
+                                 method = "repeatedcv",
+                                 repeats = 3,
+                                 verbose = T)
+
+predictors = names(fil.all)[!names(fil.all) %in% "status_group"]
+
+# Started at 11:15pm
+feat_select = rfe(trainset[,2:ncol(trainset)], 
+                  trainset$status_group,
+                  rfeControl = feat_select_control)
+
+save.image() # Started at 12:35am
+
+
+outcomeName<-'Loan_Status'
+predictors<-names(trainSet)[!names(trainSet) %in% outcomeName]
+Loan_Pred_Profile <- rfe(trainSet[,predictors], trainSet[,outcomeName],
+                         rfeControl = control)
 
 
 
