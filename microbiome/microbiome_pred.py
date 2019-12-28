@@ -93,6 +93,11 @@ s_important_mi_feats = set(important_mi_feats)
 s_important_f_feats = set(important_f_feats)
 len(s_important_mi_feats.difference(s_important_f_feats)) # 15: features selected between methods don't match
 
+
+#######################################################################################################################
+############################################## Model Building/Testing #################################################
+#######################################################################################################################
+
 # XGBoost with features selected from mutual information model
 xgboost_mi = XGBClassifier()
 # Train XGBoost model
