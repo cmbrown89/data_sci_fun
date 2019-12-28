@@ -281,9 +281,16 @@ confusionMatrix(data = rf_mod_predict, reference = observed_xg, mode = "prec_rec
 table(all_wp_feats$status_group)[names(table(all_wp_feats$status_group)) %in% "functional needs repair"]/sum(table(all_wp_feats$status_group)) # 0.07267677 
 
 # ...while functional is 54% and non functional is 38%
-table(all_wp_feats$status_group)[names(table(all_wp_feats$status_group)) %in% "functional"]/sum(table(all_wp_feats$status_group)) # 0.07267677 
-table(all_wp_feats$status_group)[names(table(all_wp_feats$status_group)) %in% "non functional"]/sum(table(all_wp_feats$status_group)) # 0.07267677 
+table(all_wp_feats$status_group)[names(table(all_wp_feats$status_group)) %in% "functional"]/sum(table(all_wp_feats$status_group)) # 0.5430808 
+table(all_wp_feats$status_group)[names(table(all_wp_feats$status_group)) %in% "non functional"]/sum(table(all_wp_feats$status_group)) # 0.3842424 
 
 # Get more classification stats
 multiClassSummary(data = data.frame("obs" = observed_xg, "pred" = predicted_xg), lev = c("1","2","3"), model = "xgbTree")
+
+save.image("well_prediction.RData")
+
+
+
+# When applying new metrics, don't forget to go back and use all of test set
+
 
